@@ -23,10 +23,10 @@ EOT
     resource_group_name     = string
     service_level           = string
     size_in_tb              = number
-    cool_access_enabled     = optional(bool, false)
+    cool_access_enabled     = optional(bool) # Default: false
     custom_throughput_mibps = optional(number)
-    encryption_type         = optional(string, "Single")
-    qos_type                = optional(string, "Auto")
+    encryption_type         = optional(string) # Default: "Single"
+    qos_type                = optional(string) # Default: "Auto"
     tags                    = optional(map(string))
   }))
 }
