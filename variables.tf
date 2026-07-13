@@ -23,28 +23,12 @@ EOT
     resource_group_name     = string
     service_level           = string
     size_in_tb              = number
-    cool_access_enabled     = optional(bool) # Default: false
+    cool_access_enabled     = optional(bool)
     custom_throughput_mibps = optional(number)
-    encryption_type         = optional(string) # Default: "Single"
-    qos_type                = optional(string) # Default: "Auto"
+    encryption_type         = optional(string)
+    qos_type                = optional(string)
     tags                    = optional(map(string))
   }))
-  validation {
-    condition = alltrue([
-      for k, v in var.netapp_pools : (
-        v.size_in_tb >= 1 && v.size_in_tb <= 2048
-      )
-    ])
-    error_message = "must be between 1 and 2048"
-  }
-  validation {
-    condition = alltrue([
-      for k, v in var.netapp_pools : (
-        v.custom_throughput_mibps == null || (v.custom_throughput_mibps >= 128)
-      )
-    ])
-    error_message = "must be at least 128"
-  }
   # --- Unconfirmed validation candidates, derived from azurerm_netapp_pool's provider source ---
   # Not auto-enabled: either a bespoke provider validator we can't safely translate,
   # or a path that crosses a list-typed block (needs its own for_each wrapping).
@@ -71,10 +55,16 @@ EOT
   #   source:    [from validate.AccountName] !regexp.MustCompile(`^[-_\da-zA-Z]{3,64}$`).MatchString(value)
   # path: service_level
   #   source:    validation.StringInSlice value list is not a literal []string - likely a generated PossibleValuesFor*() helper; resolve separately
+  # path: size_in_tb
+  #   condition: value >= 1 && value <= 2048
+  #   message:   must be between 1 and 2048
   # path: qos_type
   #   source:    validation.StringInSlice value list is not a literal []string - likely a generated PossibleValuesFor*() helper; resolve separately
   # path: encryption_type
   #   source:    validation.StringInSlice value list is not a literal []string - likely a generated PossibleValuesFor*() helper; resolve separately
+  # path: custom_throughput_mibps
+  #   condition: value >= 128
+  #   message:   must be at least 128
   # path: tags
   #   condition: length(value) <= 50
   #   message:   [from tags.Validate: invalid when len(value) > 50]
